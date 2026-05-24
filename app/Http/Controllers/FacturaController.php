@@ -20,36 +20,16 @@ class FacturaController extends Controller
         'numero_factura' => 'required',
         'cliente' => 'required',
         'fecha' => 'required|date',
-        'detalles' => 'required|array'
+        'total' => 'required',
     ]);
 
     $factura = Factura::create([
         'numero_factura' => $request->numero_factura,
         'cliente' => $request->cliente,
         'fecha' => $request->fecha,
-        'total' => 0
+        'total' => $request->total
     ]);
-
-    $total = 0;
-
-    foreach ($request->detalles as $detalle) {
-
-        $subtotal = $detalle['cantidad'] * $detalle['precio'];
-
-        $factura->detalles()->create([
-            'producto' => $detalle['producto'],
-            'cantidad' => $detalle['cantidad'],
-            'precio' => $detalle['precio'],
-            'subtotal' => $subtotal
-        ]);
-
-        $total += $subtotal;
-    }
-
-    $factura->update([
-        'total' => $total
-    ]);
-
+    
     return response()->json([
         'mensaje' => 'Factura creada correctamente',
         'factura' => $factura->load('detalles')
